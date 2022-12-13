@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VK_Parser", "VK_Parser\VK_Parser.csproj", "{1B9E68A2-87AC-45A5-A97B-27AF0381E09D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yt_DesignUI", "..\..\..\Downloads\WinFormsUserInterface-master1\WinFormsUserInterface-master\yt_DesignUI\yt_DesignUI.csproj", "{41573EE5-B877-4F9F-A173-B432995E6382}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yt_DesignUI", "VK_Parser\WinFormsUserInterface-master\yt_DesignUI\yt_DesignUI.csproj", "{41573EE5-B877-4F9F-A173-B432995E6382}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
