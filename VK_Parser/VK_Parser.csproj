@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1B9E68A2-87AC-45A5-A97B-27AF0381E09D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>VK_Parser</RootNamespace>
+    <AssemblyName>VK_Parser</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.43.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.43\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.6.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data_VK_parserDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Data_VK_parserDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="forms\authorization_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\authorization_form.Designer.cs">
+      <DependentUpon>authorization_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="forms\logs_form.cs">
+      <SubType>Form</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="forms\logs_form.Designer.cs">
+      <DependentUpon>logs_form.cs</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="forms\main_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\main_form.Designer.cs">
+      <DependentUpon>main_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="forms\main_form_2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\main_form_2.Designer.cs">
+      <DependentUpon>main_form_2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="forms\spisok_form_data.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\spisok_form_data.Designer.cs">
+      <DependentUpon>spisok_form_data.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="classes\settings.cs" />
+    <Compile Include="forms\settings_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\settings_form.Designer.cs">
+      <DependentUpon>settings_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="forms\spisok_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\spisok_form.Designer.cs">
+      <DependentUpon>spisok_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="forms\trends_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\trends_form.Designer.cs">
+      <DependentUpon>trends_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="forms\view_photos_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\view_photos_form.Designer.cs">
+      <DependentUpon>view_photos_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="classes\VK_json_friends.cs" />
+    <Compile Include="classes\VK_json_photos.cs" />
+    <Compile Include="classes\VK_json_users.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Animation\Animation.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Animation\Animator.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Components\EgoldsFormStyle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Components\EgoldsFormStyle.Designer.cs">
+      <DependentUpon>EgoldsFormStyle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Components\EgoldsStyle.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Components\RoundingButtonsComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Components\RoundingButtonsComponent.Designer.cs">
+      <DependentUpon>RoundingButtonsComponent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\EgoldsCard.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\EgoldsGoogleTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\EgoldsProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\EgoldsRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\EgoldsToggleSwitch.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\ShadowedForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Controls\yt_Button.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Drawer.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\FlatColors.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Program.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Properties\AssemblyInfo.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Properties\Resources.Designer.cs" />
+    <Compile Include="WinFormsUserInterface-master\yt_DesignUI\Properties\Settings.Designer.cs" />
+    <EmbeddedResource Include="forms\authorization_form.resx">
+      <DependentUpon>authorization_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\logs_form.resx">
+      <DependentUpon>logs_form.cs</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\main_form.resx">
+      <DependentUpon>main_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\main_form_2.resx">
+      <DependentUpon>main_form_2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\spisok_form_data.resx">
+      <DependentUpon>spisok_form_data.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\settings_form.resx">
+      <DependentUpon>settings_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\spisok_form.resx">
+      <DependentUpon>spisok_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\trends_form.resx">
+      <DependentUpon>trends_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\view_photos_form.resx">
+      <DependentUpon>view_photos_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinFormsUserInterface-master\yt_DesignUI\frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinFormsUserInterface-master\yt_DesignUI\Properties\Resources.resx" />
+    <None Include="Data_VK_parserDataSet.xsc">
+      <DependentUpon>Data_VK_parserDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="Data_VK_parserDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>Data_VK_parserDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data_VK_parserDataSet.xss">
+      <DependentUpon>Data_VK_parserDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="WinFormsUserInterface-master\.gitignore" />
+    <None Include="WinFormsUserInterface-master\README.md" />
+    <None Include="WinFormsUserInterface-master\yt_DesignUI\Properties\Settings.settings" />
+    <None Include="WinFormsUserInterface-master\yt_DesignUI\yt_DesignUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\empty_photo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data_VK_parser.accdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\loading.gif" />
+    <None Include="Resources\system_1905 %281%29.ico" />
+    <None Include="Resources\ic-cancel_97589.ico" />
+    <None Include="Resources\g0R9.gif" />
+    <None Include="Resources\4.gif" />
+    <None Include="Resources\4 %281%29.gif" />
+    <Content Include="WinFormsUserInterface-master\yt_DesignUI.sln" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
