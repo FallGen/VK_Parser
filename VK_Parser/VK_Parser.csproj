@@ -72,6 +72,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>system_1905 %281%29.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.17.1.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
       <HintPath>..\packages\AngleSharp.0.17.1\lib\net472\AngleSharp.dll</HintPath>
@@ -313,6 +316,7 @@
     <None Include="Resources\g0R9.gif" />
     <None Include="Resources\4.gif" />
     <None Include="Resources\4 %281%29.gif" />
+    <Content Include="system_1905 %281%29.ico" />
     <Content Include="WinFormsUserInterface-master\yt_DesignUI.sln" />
   </ItemGroup>
   <ItemGroup />

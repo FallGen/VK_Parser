@@ -39,12 +39,19 @@ namespace VK_Parser.forms
             try
             {
                 Animator.Start();
+            }
+            catch
+            {
+                MessageBox.Show("ошибка загрузки анимаций: перезапустите приложение", "уведомление");
+            }
+            try
+            {
                 connection_DB = new OleDbConnection(way_DB);
                 connection_DB.Open();
             }
             catch
             {
-                MessageBox.Show("ошибка загрузки анимаций: перезапустите приложение", "уведомление");
+                MessageBox.Show("ошибка загрузки базы данных", "уведомление");
             }
 
             comboBox4.SelectedIndex = 0;
@@ -1196,6 +1203,8 @@ namespace VK_Parser.forms
         public void close_appendix()
         {
             connection_DB.Close();
+            //Thread.Sleep(1000);
+            this.Close();
             Application.Exit();
         }
 
