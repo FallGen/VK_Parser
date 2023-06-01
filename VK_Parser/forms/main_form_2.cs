@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using yt_DesignUI;
 
@@ -14,7 +15,6 @@ namespace VK_Parser.forms
 {
     public partial class main_form_2 : Form
     {
-
         //подключение бд 
         public static string way_DB = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source = Data_VK_parser.accdb";
         private OleDbConnection connection_DB;
@@ -25,6 +25,7 @@ namespace VK_Parser.forms
         int global_rowindex_Data = -1;
         bool global_found_spisok = false;
         bool global_found_profil = false;
+        bool flag_messagebox = true; // глобальная переменная для управление уведомлениями messagebox 
 
         //инициализация классов и форм
         settings settings = new settings();
@@ -55,13 +56,37 @@ namespace VK_Parser.forms
             }
 
             comboBox4.SelectedIndex = 0;
+            clear_otbor_method();
+
             visible_icon_analiz(true);
 
+            create_file_BD();
             load_settings();
             authorization();
             adapterReader("SELECT id_user, id_авторизация, фамилия, имя, пол, nickname, id_профиль FROM профиль WHERE id_авторизация=" + settings.id_authorization, "main_dgv");
             dataGridView1.ClearSelection();
+            value_main_spisok.Text = dataGridView1.Rows.Count.ToString();
+            label48.Text = "id авторизации: " + settings.id_authorization;
         }
+
+        public void clear_otbor_method()
+        {
+            CB_otbor_sex.SelectedIndex = 0;
+            CB_otbor_age.SelectedIndex = 0;
+            CB_otbor_freinds.SelectedIndex = 0;
+            CB_otbor_followers.SelectedIndex = 0;
+
+            RB_otbor_x.Checked = true;
+            RB_otbor_education.Checked = false;
+            RB_otbor_number.Checked = false;
+            RB_otbor_sity.Checked = false;
+            RB_otbor_status.Checked = false;
+            RB_otbor_wibsite.Checked = false;
+
+            TB_fing_otbor.Text = "";
+            dataGridView5.RowCount = 0;
+        }
+
         public void authorization()
         {
             try
@@ -89,7 +114,7 @@ namespace VK_Parser.forms
                                 }
                             if (!flag)
 
-                                if (MessageBox.Show("профиль " + authorization_form.TB_log.Text + " не существует\n" +
+                                if (MessageBox.Show("профиль \"" + authorization_form.TB_log.Text + "\" не существует\n" +
                                     "\n" +
                                     "создать новый?", "уведомление", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                 {
@@ -98,7 +123,8 @@ namespace VK_Parser.forms
                                     command = new OleDbCommand(query, connection_DB);
                                     command.ExecuteNonQuery();
 
-                                    MessageBox.Show("авторизация локального пользователя прошла успешно", "успех");
+                                    MessageBox.Show("регистрация нового локального оператора прошла успешно", "успех");
+                                    restart();
                                 }
                                 else
                                     authorization();
@@ -128,7 +154,7 @@ namespace VK_Parser.forms
                 DataTable table = new DataTable();
                 adapter.Fill(table);
                 string[] array = { "фамилия", "имя", "пол", "nickname", "id_user", "id_профиль" };
-                string[] array1 = { "друзья", "подписчики", "подписчики", "фотографий", "видеозаписей", "аудиозаписей", "сообщетсв", "подарки" };
+                //string[] array1 = { "друзья", "подписчики", "подписчики", "фотографий", "видеозаписей", "аудиозаписей", "сообщетсв", "подарки" };
 
 
                 dataGridView1.RowCount = 0;
@@ -141,7 +167,7 @@ namespace VK_Parser.forms
                     }
                 }
 
-                update_value_snimok();
+                update_value_snimok(0); // 0 - выполнять код в главную таблицу
 
                 dataGridView1.Refresh();
             }
@@ -149,11 +175,10 @@ namespace VK_Parser.forms
         }
         public void load_settings()
         {
-            string name = "settings";
-
-            using (BinaryReader file = new BinaryReader(File.Open(name, FileMode.Open)))
+            string path_wallpaper = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\settings";
+            try
             {
-                try
+                using (BinaryReader file = new BinaryReader(File.Open(path_wallpaper, FileMode.Open)))
                 {
                     settings_form.checkBox1.Checked = settings.open_logs = Convert.ToBoolean(file.ReadBoolean());
                     settings_form.authorization.Checked = settings.authorization = Convert.ToBoolean(file.ReadBoolean());
@@ -162,16 +187,28 @@ namespace VK_Parser.forms
                     settings_form.CB_autosave_time.SelectedIndex = Convert.ToInt32(file.ReadInt32());
                     settings_form.CB_smart_save.Checked = settings.smart_save = Convert.ToBoolean(file.ReadBoolean());
                 }
-                catch (Exception E) { MessageBox.Show(E.Message, "ошибка"); }
+            }
+            catch (Exception E)
+            {
+                MessageBox.Show(E.Message, "ошибка");
+
+                string path = $@"C:\Users\{Environment.UserName}\AppData\Roaming\";
+                string subpath = @"VK_Parser by FallGen";
+
+                DirectoryInfo dirInfo = new DirectoryInfo(path);
+                if (!dirInfo.Exists)
+                    dirInfo.Create();
+                dirInfo.CreateSubdirectory(subpath);
             }
         }
+
         public void save_setting()
         {
-            string name = "settings";
+            string path_wallpaper = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\settings";
 
-            using (BinaryWriter file = new BinaryWriter(File.Open(name, FileMode.Create)))
+            try
             {
-                try
+                using (BinaryWriter file = new BinaryWriter(File.Open(path_wallpaper, FileMode.Create)))
                 {
                     file.Write(Convert.ToBoolean(settings_form.checkBox1.Checked));
                     file.Write(Convert.ToBoolean(settings.authorization));
@@ -179,9 +216,22 @@ namespace VK_Parser.forms
                     file.Write(Convert.ToInt32(settings_form.time.SelectedIndex));
                     file.Write(Convert.ToInt32(settings_form.CB_autosave_time.SelectedIndex));
                     file.Write(Convert.ToInt32(settings_form.CB_smart_save.Checked));
-
                 }
-                catch (Exception E) { MessageBox.Show(E.Message, "ошибка"); }
+            }
+            catch (Exception E)
+            {
+
+                MessageBox.Show(E.Message, "ошибка");
+
+                string path = $@"C:\Users\{Environment.UserName}\AppData\Roaming\";
+                string subpath = @"VK_Parser by FallGen";
+
+                DirectoryInfo dirInfo = new DirectoryInfo(path);
+                if (!dirInfo.Exists)
+                    dirInfo.Create();
+                dirInfo.CreateSubdirectory(subpath);
+
+                save_setting();
             }
 
             load_settings();
@@ -311,9 +361,6 @@ namespace VK_Parser.forms
                         pages.Text = Convert.ToString(user.response[0].counters.pages);
                         TBfollowers.Text = Convert.ToString(user.response[0].counters.followers);
                     }
-                    //posts.Text = Convert.ToString(user.response[0].posts);
-
-                    //toolStripProgressBar1.Value = 60;
 
                     if (user.response[0].last_seen != null)
                     {
@@ -338,8 +385,6 @@ namespace VK_Parser.forms
                         global_save_flag = false;
                     }
 
-                    // toolStripProgressBar1.Value = 80;
-
                     //кол-во друзей
                     HttpResponseMessage response_friends = await client.GetAsync("https://api.vk.com/method/friends.get?&user_id=" + user.response[0].id + "&order=name&count=1000&fields=domain&access_token=" + ACCESS_TOKEN + "&v=" + Version);
                     var data_friends = await response_friends.Content.ReadAsStringAsync();
@@ -350,10 +395,8 @@ namespace VK_Parser.forms
                         TBfriends.Text = Convert.ToString(friends.response.count);
                     else TBfriends.Text = "0";
 
-                    //Thread.Sleep(500);
                     last_update.Text = "последнее обновление: " + DateTime.Now.ToString();
                     TB_focus();
-                    //work_all_button(true);
 
                     if (user.response[0].is_closed)
                     {
@@ -382,11 +425,7 @@ namespace VK_Parser.forms
                         else work_button(true, false);
                     }
 
-                    //toolStripProgressBar1.Value = 100;
-                    //TB_otclick.Text = (Math.Abs(DateTime.Now.Second - time_second) <= 15) ? Convert.ToString("отклик: " + (Math.Abs(DateTime.Now.Second - time_second)) + ":" + (Math.Abs(DateTime.Now.Millisecond - time_milisecond))) : "отклик: -";
-
                     load_info();
-
                 }
                 else
                 {
@@ -418,13 +457,17 @@ namespace VK_Parser.forms
         }
         private async void save_DB(int id, string first_name, string last_name, string sex, string domain)
         {
-            string query = "INSERT INTO профиль (id_user, id_авторизация, фамилия, имя, пол, nickname) VALUES ('" + id + "','" + settings.id_authorization + "','" + last_name + "','" + first_name + "','" + sex + "','" + domain + "')";
+            string query = "INSERT INTO профиль (id_user, id_авторизация, фамилия, имя, пол, nickname) VALUES ('" + id + "','" + settings.id_authorization + "','" + last_name.Replace("'", "") + "','" + first_name.Replace("'", "") + "','" + sex + "','" + domain + "')";
             OleDbCommand command = new OleDbCommand(query, connection_DB);
             command.ExecuteNonQuery();
 
             adapterReader("SELECT id_user, id_авторизация, фамилия, имя, пол, nickname, id_профиль FROM профиль WHERE id_авторизация=" + settings.id_authorization, "main_dgv");
 
-            MessageBox.Show("профиль успешно сохранён в базу данных", "успех");
+            if (flag_messagebox)
+            {
+                flag_messagebox = true;
+                MessageBox.Show("профиль успешно сохранён в базу данных", "успех");
+            }
         }
         public void work_button(bool flag, bool close_profil)
         {
@@ -461,6 +504,9 @@ namespace VK_Parser.forms
         }
         public void TB_focus()
         {
+
+            value_main_spisok.Text = dataGridView1.Rows.Count.ToString();
+
             if (tabControl1.SelectedIndex <= 1)
             {
                 type_profil.Focus();
@@ -486,6 +532,16 @@ namespace VK_Parser.forms
                 gifts.Focus();
                 pages.Focus();
                 find_id.Focus();
+            }
+
+            if (tabControl1.SelectedIndex == 6)
+            {
+                type_profil.Focus();
+                online.Focus();
+                domain.Focus();
+                id.Focus();
+                name.Focus();
+                sex.Focus();
             }
         }
         private void found_profil_Click(object sender, EventArgs e)
@@ -537,7 +593,9 @@ namespace VK_Parser.forms
             domain.Text = "";
             status.Text = "";
             sex.Text = "";
-            type_profil.Text = "профиль:";
+            TB_find_friends.Text = "";
+            TB_find_followers.Text = "";
+            type_profil.Text = "пустой";
             type_profil.BackColor = SystemColors.Control;
             pictureBox2.Image = null;
             dataGridView2.RowCount = 0;
@@ -568,30 +626,63 @@ namespace VK_Parser.forms
         {
             delete_profil();
         }
-        public async void delete_profil()
+
+        private void delete_all_profile_Click(object sender, EventArgs e)
         {
-            if (global_id_Data != null && global_rowindex_Data != -1)
+            try
             {
-                if (MessageBox.Show("удалить профиль " + dataGridView1[0, global_rowindex_Data].Value + " " + dataGridView1[1, global_rowindex_Data].Value + " (id: " + dataGridView1[4, global_rowindex_Data].Value + ") из базы данных?", "удаление профиля", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show("удалить все профили из базы данных?", "удаление профилей", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    string query = "DELETE FROM профиль WHERE [id_профиль] = " + global_id_Data;
+                    for (int i = dataGridView1.Rows.Count - 1; i >= 0; i--)
+                        dataGridView1.Rows.RemoveAt(i);
+
+                    string query = "DELETE FROM профиль WHERE [id_авторизация] = " + settings.id_authorization;
                     OleDbCommand command = new OleDbCommand(query, connection_DB);
                     command.ExecuteNonQuery();
-                    clear_method();
-                    dataGridView1.Rows.RemoveAt(dataGridView1.CurrentRow.Index);
 
+                    clear_method();
                     dataGridView1.ClearSelection();
                     global_id_Data = null; global_rowindex_Data = -1;
                     work_button(false, true);
                     delete_one_profile.BackColor = Color.SteelBlue;
                     delete_one_profile.Enabled = false;
-                    main_form_2.ActiveForm.Text = "VK_Parser by FallGen";
+                    this.Text = "VK_Parser by FallGen";
                     TB_focus();
-                    MessageBox.Show("профиль успешно удалён", "успех");
+                    MessageBox.Show("база профилей успешно удалёна", "успех");
                 }
             }
-            else
-                MessageBox.Show("не выбран профиль для удаления", "уведомление");
+            catch { }
+        }
+
+        public async void delete_profil()
+        {
+            try
+            {
+                if (global_id_Data != null && global_rowindex_Data != -1)
+                {
+                    if (MessageBox.Show("удалить профиль " + dataGridView1[0, global_rowindex_Data].Value + " " + dataGridView1[1, global_rowindex_Data].Value + " (id: " + dataGridView1[4, global_rowindex_Data].Value + ") из базы данных?", "удаление профиля", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        string query = "DELETE FROM профиль WHERE [id_профиль] = " + global_id_Data + " AND [id_авторизация] = " + settings.id_authorization;
+                        OleDbCommand command = new OleDbCommand(query, connection_DB);
+                        command.ExecuteNonQuery();
+                        clear_method();
+
+                        dataGridView1.Rows.RemoveAt(dataGridView1.CurrentRow.Index);
+
+                        dataGridView1.ClearSelection();
+                        global_id_Data = null; global_rowindex_Data = -1;
+                        work_button(false, true);
+                        delete_one_profile.BackColor = Color.SteelBlue;
+                        delete_one_profile.Enabled = false;
+                        main_form_2.ActiveForm.Text = "VK_Parser by FallGen";
+                        TB_focus();
+                        MessageBox.Show("профиль успешно удалён", "успех");
+                    }
+                }
+                else
+                    MessageBox.Show("не выбран профиль для удаления", "уведомление");
+            }
+            catch { }
         }
         private void main_form_2_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -622,7 +713,7 @@ namespace VK_Parser.forms
             switch (tabControl1.SelectedIndex)
             {
                 case 0:
-                    main_form_2.ActiveForm.Text = "VK_Parser by FallGen: профиль " + name_form;
+                    main_form_2.ActiveForm.Text = "VK_Parser by FallGen: " + name_form;
                     break;
                 case 1:
                     main_form_2.ActiveForm.Text = "VK_Parser by FallGen: информация о " + name_form;
@@ -642,6 +733,13 @@ namespace VK_Parser.forms
                     dataGridView4.ClearSelection();
                     main_form_2.ActiveForm.Text = "VK_Parser by FallGen: анализ " + name_form;
                     break;
+                case 6:
+                    main_form_2.ActiveForm.Text = "VK_Parser by FallGen: отбор данных";
+                    break;
+                case 7:
+                    main_form_2.ActiveForm.Text = "VK_Parser by FallGen: настройки";
+                    upload_DB_users("refresh");
+                    break;
             }
         }
         private void snimok_profil_Click(object sender, EventArgs e)
@@ -658,17 +756,29 @@ namespace VK_Parser.forms
 
             create_snimok();
         }
-        public void update_value_snimok()
+        public void update_value_snimok(int type)   // type - выбор таблицы для расчёта снимков 
+                                                    // 0: dgv1 - главная таблица
+                                                    // 1: dgv5 - таблица отбора
         {
             // 7 столбец: кол-во снимков
             int i = 0;
+
             while (i < dataGridView1.RowCount)
             {
-
                 OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT друзья, подписчики, фотографий, видеозаписей, аудиозаписей, сообществ, подарки, дата FROM снимок WHERE id_профиль=" + dataGridView1[5, i].Value, connection_DB);
                 DataTable table = new DataTable();
                 adapter.Fill(table);
-                dataGridView1[7, i].Value = Convert.ToString(table.Rows.Count);
+
+                switch (type)
+                {
+                    case 0:
+                        dataGridView1[7, i].Value = Convert.ToString(table.Rows.Count);
+                        break;
+                    case 1:
+                        dataGridView5[4, i].Value = Convert.ToString(table.Rows.Count);
+                        break;
+                }
+
                 i++;
             }
 
@@ -679,7 +789,7 @@ namespace VK_Parser.forms
             {
                 if (global_rowindex_Data != -1)
                 {
-                    string query = "INSERT INTO снимок (id_user, друзья, подписчики, фотографий, видеозаписей, аудиозаписей, сообществ, подарки, статус, семейное_положение, место_учебы, сайт, город, день_рождения, номер_телефона, nickname, дата, id_профиль) VALUES ('" + dataGridView1[4, global_rowindex_Data].Value + "','" + TBfriends.Text + "','" + TBfollowers.Text + "','" + photos.Text + "','" + videos.Text + "','" + audios.Text + "','" + pages.Text + "','" + gifts.Text + "','" + status.Text + "','" + relation.Text + "','" + education.Text + "','" + site.Text + "','" + city.Text + "','" + bdate.Text + "','" + contacts.Text + "','" + domain.Text.Replace("https://vk.com/", "") + "','" + DateTime.Now.ToLongDateString() + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
+                    string query = "INSERT INTO снимок (id_user, друзья, подписчики, фотографий, видеозаписей, аудиозаписей, сообществ, подарки, статус, семейное_положение, место_учебы, сайт, город, день_рождения, номер_телефона, nickname, дата, id_профиль) VALUES ('" + dataGridView1[4, global_rowindex_Data].Value + "','" + TBfriends.Text + "','" + TBfollowers.Text + "','" + photos.Text + "','" + videos.Text + "','" + audios.Text + "','" + pages.Text + "','" + gifts.Text + "','" + status.Text.Replace("'", "") + "','" + relation.Text + "','" + education.Text + "','" + site.Text.Replace("'", "") + "','" + city.Text.Replace("'", "") + "','" + bdate.Text + "','" + contacts.Text + "','" + domain.Text.Replace("https://vk.com/", "") + "','" + DateTime.Now.ToLongDateString() + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
                     OleDbCommand command = new OleDbCommand(query, connection_DB);
                     command.ExecuteNonQuery();
 
@@ -694,7 +804,7 @@ namespace VK_Parser.forms
                     string[,] people = get_people(data);
                     for (int i = 0; i < people.GetLength(1); i++)
                     {
-                        query = @"INSERT INTO список_друзей (id_снимок, id_user, фамилия, имя, пол, город, nickname, id_профиль) VALUES ('" + table.Rows[table.Rows.Count - 1]["id_снимок"] + "','" + people[1, i] + "','" + people[2, i].Replace("'", "") + "','" + people[3, i].Replace("'", "") + "','" + people[4, i] + "','" + people[5, i] + "','" + people[6, i] + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
+                        query = @"INSERT INTO список_друзей (id_снимок, id_user, фамилия, имя, пол, город, nickname, id_профиль) VALUES ('" + table.Rows[table.Rows.Count - 1]["id_снимок"] + "','" + people[1, i] + "','" + people[2, i].Replace("'", "") + "','" + people[3, i].Replace("'", "") + "','" + people[4, i] + "','" + people[5, i].Replace("'", "") + "','" + people[6, i] + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
                         command = new OleDbCommand(query, connection_DB);
                         command.ExecuteNonQuery();
                     }
@@ -707,12 +817,12 @@ namespace VK_Parser.forms
 
                     for (int i = 0; i < people.GetLength(1); i++)
                     {
-                        query = @"INSERT INTO список_подписчиков (id_снимок, id_user, фамилия, имя, пол, город, nickname, id_профиль) VALUES ('" + table.Rows[table.Rows.Count - 1]["id_снимок"] + "','" + people[1, i] + "','" + people[2, i].Replace("'", "") + "','" + people[3, i].Replace("'", "") + "','" + people[4, i] + "','" + people[5, i] + "','" + people[6, i] + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
+                        query = @"INSERT INTO список_подписчиков (id_снимок, id_user, фамилия, имя, пол, город, nickname, id_профиль) VALUES ('" + table.Rows[table.Rows.Count - 1]["id_снимок"] + "','" + people[1, i] + "','" + people[2, i].Replace("'", "") + "','" + people[3, i].Replace("'", "") + "','" + people[4, i] + "','" + people[5, i].Replace("'", "") + "','" + people[6, i] + "','" + dataGridView1[5, global_rowindex_Data].Value + "')";
                         command = new OleDbCommand(query, connection_DB);
                         command.ExecuteNonQuery();
                     }
 
-                    update_value_snimok();
+                    update_value_snimok(0); // 0 - выполнять код в главную таблицу
                     load_info();
                     //textBox1.Text = Convert.ToString(Convert.ToInt32(textBox1.Text) + 1);
 
@@ -722,7 +832,7 @@ namespace VK_Parser.forms
                     MessageBox.Show("сохраните и выберите профиль", "уведомление");
 
             }
-            catch (Exception E) { /*MessageBox.Show(E.Message, "ошибка");*/ }
+            catch (Exception E) { MessageBox.Show(E.Message, "ошибка"); }
         }
 
 
@@ -927,9 +1037,12 @@ namespace VK_Parser.forms
             VK_json_friends.Rootobject spisok = JsonConvert.DeserializeObject<VK_json_friends.Rootobject>(data);
 
             int lenght = 999;
-            //if (spisok.response != null)
-            if (spisok.response.count < 1000)
-                lenght = spisok.response.count;
+            try
+            {
+                if (spisok.response.count < 1000)
+                    lenght = spisok.response.count;
+            }
+            catch { lenght = 0; }
 
             string[,] array = new string[7, lenght];
 
@@ -1888,5 +2001,488 @@ namespace VK_Parser.forms
             try { Clipboard.SetText(Convert.ToString(id_user)); } catch (Exception) { }
         }
 
+        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            clear_otbor_method();
+        }
+
+        private void linkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://fallgen.github.io/") { UseShellExecute = true });
+        }
+
+        private void linkLabel4_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://t.me/FallGen") { UseShellExecute = true });
+        }
+
+        private void BTN_otbor_Click(object sender, EventArgs e)
+        {
+            string sql_authorization = "профиль.id_авторизация = " + settings.id_authorization;
+
+            string sql_sity = "снимок.город Like \"%" + TB_fing_otbor.Text + "%\"";
+            string sql_status = "снимок.статус Like \"%" + TB_fing_otbor.Text + "%\"";
+            string sql_education = "снимок.место_учебы Like \"%" + TB_fing_otbor.Text + "%\"";
+            string sql_number = "снимок.номер_телефона Like \"%" + TB_fing_otbor.Text + "%\"";
+            string sql_wibsite = "(снимок.сайт Like \"%" + TB_fing_otbor.Text + "%\") ";
+
+            string if_sql_sex = null;
+            string if_sql_age = null;
+            string if_sql_friends = null;
+            string if_sql_followers = null;
+
+            //пол
+            switch (CB_otbor_sex.SelectedIndex)
+            {
+                case 0:
+                    if_sql_sex = "профиль.[пол] IS NOT NULL"; //неважно
+                    break;
+                case 1:
+                    if_sql_sex = "профиль.[пол]=\"мужской\""; //мужской
+                    break;
+                case 2:
+                    if_sql_sex = "профиль.[пол]=\"женский\""; //женский
+                    break;
+            }
+
+            //возраст
+            switch (CB_otbor_age.SelectedIndex)
+            {
+                case 0:
+                    if_sql_age = "снимок.[день_рождения] Is Not Null"; //неважно
+                    break;
+                case 1:
+                    if_sql_age = "снимок.[день_рождения] Is Not Null"; //неважно
+
+                    //if_sql_age = "((Дата()-снимок.[день_рождения])/365.25)<18"; //младше 18
+                    break;
+                case 2:
+                    if_sql_age = "снимок.[день_рождения] Is Not Null"; //неважно
+
+                    //if_sql_age = "((Дата()-снимок.[день_рождения])/365.25)>18"; //старше 18
+                    break;
+                case 3:
+                    if_sql_age = "снимок.[день_рождения] Is Not Null"; //неважно
+
+                    //if_sql_age = "профиль.[пол]=\"женский\""; //старше 30
+                    break;
+                case 4:
+                    if_sql_age = "снимок.[день_рождения] Is Not Null"; //неважно
+
+                    //if_sql_age = "профиль.[пол]=\"женский\""; //старше 40
+                    break;
+            }
+
+            //друзей
+            switch (CB_otbor_freinds.SelectedIndex)
+            {
+                case 0:
+                    if_sql_friends = "снимок.друзья > 0"; //неважно
+                    break;
+                case 1:
+                    if_sql_friends = "снимок.друзья < 50"; //до 50
+                    break;
+                case 2:
+                    if_sql_friends = "снимок.друзья > 50"; //от 50
+                    break;
+                case 3:
+                    if_sql_friends = "снимок.друзья < 100";//до 100
+                    break;
+                case 4:
+                    if_sql_friends = "снимок.друзья > 100"; //от 100
+                    break;
+                case 5:
+                    if_sql_friends = "снимок.друзья < 500"; //до 500
+                    break;
+                case 6:
+                    if_sql_friends = "снимок.друзья > 500"; //от 500
+                    break;
+                case 7:
+                    if_sql_friends = "снимок.друзья < 1000"; //до 1000
+                    break;
+                case 8:
+                    if_sql_friends = "снимок.друзья > 1000"; //от 1000
+                    break;
+            }
+            //подписчиков
+            switch (CB_otbor_followers.SelectedIndex)
+            {
+                case 0:
+                    if_sql_followers = "снимок.подписчики > 0"; //неважно
+                    break;
+                case 1:
+                    if_sql_followers = "снимок.подписчики< 50"; //до 50
+                    break;
+                case 2:
+                    if_sql_followers = "снимок.подписчики > 50"; //от 50
+                    break;
+                case 3:
+                    if_sql_followers = "снимок.подписчики < 100";//до 100
+                    break;
+                case 4:
+                    if_sql_followers = "снимок.подписчики > 100"; //от 100
+                    break;
+                case 5:
+                    if_sql_followers = "снимок.подписчики < 500"; //до 500
+                    break;
+                case 6:
+                    if_sql_followers = "снимок.подписчики > 500"; //от 500
+                    break;
+                case 7:
+                    if_sql_followers = "снимок.подписчики < 1000"; //до 1000
+                    break;
+                case 8:
+                    if_sql_followers = "снимок.подписчики > 1000"; //от 1000
+                    break;
+            }
+
+            //полный sql запрос по CB
+            string sql_full_CB = sql_authorization + " AND " + if_sql_sex + " AND " + if_sql_age + " AND " + if_sql_friends + " AND " + if_sql_followers;
+
+            //базовый вывод сохраненных профилей
+            if (RB_otbor_x.Checked)
+            {
+                adapter_otbor("SELECT id_user, фамилия, имя FROM профиль WHERE " + sql_authorization, "");
+                update_value_snimok(1); // 0 - выполнять код в таблицу отбора
+            }
+
+            //вывод по городу
+            if (RB_otbor_sity.Checked)
+                adapter_otbor("SELECT DISTINCT профиль.id_user, профиль.фамилия, профиль.имя, снимок.город FROM профиль INNER JOIN снимок ON профиль.[id_профиль] = снимок.[id_профиль] WHERE " + sql_sity + " AND " + sql_full_CB, "город");
+
+            //вывод по статусу
+            if (RB_otbor_status.Checked)
+                adapter_otbor("SELECT DISTINCT профиль.id_user, профиль.фамилия, профиль.имя, снимок.статус FROM профиль INNER JOIN снимок ON профиль.[id_профиль] = снимок.[id_профиль] WHERE " + sql_status + " AND " + sql_full_CB, "статус");
+
+            //вывод по месту учебы
+            if (RB_otbor_education.Checked)
+                adapter_otbor("SELECT DISTINCT профиль.id_user, профиль.фамилия, профиль.имя, снимок.место_учебы FROM профиль INNER JOIN снимок ON профиль.[id_профиль] = снимок.[id_профиль] WHERE " + sql_education + " AND " + sql_full_CB, "место_учебы");
+
+            //вывод по номер_телефона
+            if (RB_otbor_number.Checked)
+                adapter_otbor("SELECT DISTINCT профиль.id_user, профиль.фамилия, профиль.имя, снимок.номер_телефона FROM профиль INNER JOIN снимок ON профиль.[id_профиль] = снимок.[id_профиль] WHERE " + sql_number + " AND " + sql_full_CB, "номер_телефона");
+
+            //вывод по сайту
+            if (RB_otbor_wibsite.Checked)
+                adapter_otbor("SELECT DISTINCT профиль.id_user, профиль.фамилия, профиль.имя, снимок.сайт FROM профиль INNER JOIN снимок ON профиль.[id_профиль] = снимок.[id_профиль] WHERE " + sql_wibsite + " AND " + sql_full_CB, "сайт");
+        }
+
+        public void adapter_otbor(string query, string otbor)
+        {
+            try
+            {
+                OleDbDataAdapter adapter = new OleDbDataAdapter(query, connection_DB);
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+                string[] array = { "id_user", "фамилия", "имя", otbor };
+
+                dataGridView5.RowCount = 0;
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    dataGridView5.RowCount++;
+                    dataGridView5[0, i].Value = i + 1;
+                    for (int j = 0; j < table.Columns.Count; j++)
+                    {
+                        dataGridView5[j + 1, i].Value = Convert.ToString(table.Rows[i][array[j]]);
+                    }
+                }
+
+                dataGridView5.Refresh();
+                dataGridView5.ClearSelection();
+            }
+            catch (Exception E) { MessageBox.Show(E.Message, "ошибка"); }
+        }
+
+        private void dataGridView5_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            try
+            {
+                dataGridView5.Rows[e.RowIndex].Selected = true;
+                dataGridView5.RowsDefaultCellStyle.SelectionForeColor = Color.White;
+
+                clear_method();
+                find_id.Text = Convert.ToString(dataGridView5[1, e.RowIndex].Value);
+                method_NewtonsoftJson(false);
+
+                TB_focus();
+            }
+            catch (Exception E) { /*MessageBox.Show(E.Message, "ошибка"); */};
+
+        }
+
+        private void BTN_accaunt_authorization_Click(object sender, EventArgs e)
+        {
+            restart();
+        }
+
+        public void restart ()
+        {
+            settings.authorization = false;
+
+            save_setting();
+
+            Application.Restart();
+            Environment.Exit(0);
+        }
+
+        private void BTN_old_settings_Click(object sender, EventArgs e)
+        {
+            // settings_form settings_form = new settings_form();
+
+            if (settings_form.ShowDialog() == DialogResult.OK)
+            {
+                settings.authorization = settings_form.authorization.Checked;
+                save_setting();
+                MessageBox.Show("настройки успешно изменены", "успех");
+            }
+        }
+
+        private void linkLabel5_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("explorer.exe", $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen");
+        }
+
+        private void linkLabel6_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            // изменить перед релизом
+            Process.Start("explorer.exe", $@"C:\Users\{Environment.UserName}\Documents\GitHub\VK_Parser");
+        }
+
+        private void BTN_open_website_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(site.Text) { UseShellExecute = true });
+            }
+            catch { }
+        }
+
+
+        //создание текстового документа для автоматической заполнении базы данных
+        private void linkLabel7_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("notepad", $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\BD_users");
+        }
+
+        public void create_file_BD()
+        {
+            string path_BD = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\BD_users";
+
+            try
+            {
+                using (BinaryReader file = new BinaryReader(File.Open(path_BD, FileMode.Open))) { }
+
+            }
+            catch (Exception E)
+            {
+                //MessageBox.Show(E.Message, "предупреждение");
+                using (BinaryReader file = new BinaryReader(File.Open(path_BD, FileMode.Create))) { }
+
+                //create_file_BD();
+            }
+        }
+
+        private async void yt_Button8_Click(object sender, EventArgs e)
+        {
+            //импорт (загрузить БД пользователей) 
+            //auto_filling_id_user_in_DB();
+            await load_DB_users();
+        }
+
+        public async Task load_DB_users()
+        {
+            int value_i = Convert.ToInt32(TB_import_value.Text);
+            try
+            {
+                string path_BD = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\BD_users";
+                if (MessageBox.Show("импортировать БД? \nдля импорта потребуется некоторое время: примерно " + (value_i * 300) / 1000 + "сек \nво время импорта приложение будет недоступно для использования!", "импорт базы данных", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    using (BinaryReader file = new BinaryReader(File.Open(path_BD, FileMode.Open)))
+                    {
+
+                        string sex = null;
+                        label_process_importa.Visible = true;
+
+                        for (int i = 0; i < value_i; i++)
+                        {
+                            Thread.Sleep(300);
+
+                            HttpResponseMessage response_users = await client.GetAsync("https://api.vk.com/method/users.get?&user_id=" + file.ReadInt32().ToString() + "&lang=0&fields=domain,sex,is_favorite&access_token=" + ACCESS_TOKEN + "&v=" + Version);
+
+                            var data_user = await response_users.Content.ReadAsStringAsync();
+
+                            VK_json_users.Rootobject user = JsonConvert.DeserializeObject<VK_json_users.Rootobject>(data_user);
+
+                            switch (user.response[0].sex)
+                            {
+                                case 0: sex = "не указан"; break;
+                                case 1: sex = "женский"; break;
+                                case 2: sex = "мужской"; break;
+                            }
+
+                            flag_messagebox = false;
+                            if (!user.response[0].is_closed && user.response[0].first_name != "DELETED")
+                                save_DB(user.response[0].id, user.response[0].first_name, user.response[0].last_name, sex, user.response[0].domain);
+
+                            label_process_importa.Text = "процесс импорта: " + value_i + "/" + i;
+                        }
+
+                        label_process_importa.Visible = false;
+                        MessageBox.Show("импорт завершен", "успех");
+                    }
+            }
+            catch (Exception E)
+            {
+                label_process_importa.Visible = false;
+                MessageBox.Show(E.Message, "ошибка");
+            }
+        }
+
+        private void TB_value_iteration_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (Char.IsDigit(e.KeyChar) | e.KeyChar == '\b') return;
+            else
+                e.Handled = true;
+        }
+
+        private void yt_Button9_Click(object sender, EventArgs e)
+        {
+            //экспорт (выгрузить пользователей)
+            upload_DB_users("delete");
+        }
+
+        public void upload_DB_users(string doig)
+        {
+            try
+            {
+                //string sql = "SELECT DISTINCT список_друзей.[id_user] FROM список_друзей";
+
+                //string sql = "SELECT DISTINCT список_друзей.id_user, авторизация.id_авторизация FROM авторизация INNER JOIN (список_друзей INNER JOIN профиль ON список_друзей.id_профиль = профиль.id_профиль) ON авторизация.id_авторизация = профиль.id_авторизация WHERE id_авторизация = " + settings.id_authorization;
+
+                string sql = "SELECT DISTINCT авторизация.id_авторизация, список_друзей.id_user FROM(авторизация INNER JOIN профиль ON авторизация.id_авторизация = профиль.id_авторизация) INNER JOIN список_друзей ON профиль.id_профиль = список_друзей.id_профиль WHERE (((авторизация.id_авторизация)= " + settings.id_authorization + "))";
+
+
+                string path_BD = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\BD_users";
+
+                OleDbDataAdapter adapter = new OleDbDataAdapter(sql, connection_DB);
+                DataTable table = new DataTable();
+                adapter.Fill(table);
+
+                if (doig == "delete")
+                {
+                    if (MessageBox.Show("удалить старую базу данных и добавить " + table.Rows.Count + " уникальных пользователей?", "экспорт базы данных", MessageBoxButtons.OKCancel) == DialogResult.OK)
+
+                        using (BinaryWriter file = new BinaryWriter(File.Open(path_BD, FileMode.Open)))
+                        {
+                            for (int i = 0; i < table.Rows.Count; i++)
+                                file.Write(Convert.ToInt32(table.Rows[i]["id_user"]));
+
+                            MessageBox.Show("база данных пользователей успешно выгружена", "успех");
+                        }
+                }
+                else
+                    if (doig == "refresh")
+                {
+                    TB_export_value.Text = table.Rows.Count.ToString();
+                }
+            }
+            catch (Exception E) { MessageBox.Show(E.Message, "ошибка"); }
+        }
+
+        private void linkLabel7_LinkClicked_1(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string filepath = $@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\Excel.xlsx";
+
+            try
+            {
+                using (Excel_improt.Excel_improt helper = new Excel_improt.Excel_improt())
+                {
+                    helper.delete(filepath);
+
+                    if (helper.Open(filePath: Path.Combine(Environment.CurrentDirectory, filepath)))
+                    {
+                        int c = 0;
+                        for (int i = 2; i < dataGridView5.Rows.Count+2; i++)
+                        {
+                            helper.Set(column: "B", row: i, data: dataGridView5[0,c].Value);
+                            helper.Set(column: "C", row: i, data: dataGridView5[1,c].Value);
+                            helper.Set(column: "D", row: i, data: dataGridView5[2,c].Value);
+                            helper.Set(column: "E", row: i, data: dataGridView5[3,c].Value);
+                            helper.Set(column: "F", row: i, data: dataGridView5[4,c].Value);
+
+                            c++;
+                        }
+
+                        helper.Save();
+
+                        Process.Start($@"C:\Users\{Environment.UserName}\AppData\Roaming\VK_Parser by FallGen\Excel.xlsx");
+                    }
+                }
+
+                Console.Read();
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            fullscrean_photo(1); // 1 - главная фотография
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            fullscrean_photo(2); // 2 - фотография со вкладки "фотографии"
+        }
+
+        private void fullscrean_photo(int value) // value - ид, с которого приходит фотография
+        {
+            fullscrean_photo form = new fullscrean_photo();
+
+            Image img = null;
+
+            switch (value)
+            {
+                case 1:
+                    img = pictureBox1.Image;
+                    break;
+                case 2:
+                    img = pictureBox2.Image;
+                    break;
+            }
+
+            form.pictureBox1.Image = img;
+
+            form.ShowDialog();
+        }
+
+        private void tabControl1_MouseMove(object sender, MouseEventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+        }
+
+        private void tabControl1_MouseLeave(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+        }
+
+        private void pictureBox1_MouseLeave(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+        }
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+        }
+
+        private void pictureBox2_MouseLeave(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+        }
     }
 }

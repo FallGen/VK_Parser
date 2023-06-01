@@ -84,3 +84,11 @@ C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.csproj.C
 C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.csproj.CopyComplete
 C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.exe
 C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.pdb
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.csproj.ResolveComReference.cache
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Api.CommonProtos.dll
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Protobuf.dll
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Api.CommonProtos.pdb
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Api.CommonProtos.xml
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Protobuf.pdb
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\bin\Debug\Google.Protobuf.xml
+C:\Users\n_332\Documents\GitHub\VK_Parser\VK_Parser\obj\Debug\VK_Parser.forms.fullscrean_photo.resources

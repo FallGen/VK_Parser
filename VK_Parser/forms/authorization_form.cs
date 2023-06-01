@@ -26,6 +26,12 @@ namespace VK_Parser
         private void button2_Click(object sender, EventArgs e)
         {
             Close();
+            this.Close();
+            Application.Exit();
+
+            this.Close();
+            Environment.Exit(0);
+
         }
         private void TB_pass_KeyUp(object sender, KeyEventArgs e)
         {
@@ -35,6 +41,16 @@ namespace VK_Parser
         private void TB_log_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter) DialogResult = DialogResult.OK;
+        }
+
+        private void authorization_form_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //Application.Exit();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

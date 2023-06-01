@@ -119,6 +119,7 @@
             this.button1.TabIndex = 0;
             this.button1.Text = "авторизироваться";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -144,6 +145,7 @@
             this.Name = "authorization_form";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "авторизация локального пользователя";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.authorization_form_FormClosed);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
